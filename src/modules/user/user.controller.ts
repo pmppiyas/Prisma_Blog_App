@@ -30,8 +30,22 @@ const getAllUsers = catchAsync(
   }
 );
 
+const getAuser = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const user = await UserServices.getAuser(Number(req.params.id));
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Single user retrieved successfully",
+      data: user,
+    });
+  }
+);
+
 const UserController = {
   createUser,
   getAllUsers,
+  getAuser,
 };
 export default UserController;
