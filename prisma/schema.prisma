@@ -12,7 +12,7 @@ model User {
   name       String
   email      String
   password   String?
-  role       Role
+  role       Role     @default(USER)
   phone      String
   picture    String?
   status     status   @default(ACTIVE)
