@@ -8,7 +8,12 @@ const createUser = async (payload: Prisma.UserCreateInput) => {
   return create;
 };
 
+const getAllUsers = async () => {
+  return await prisma.user.findMany({});
+};
+
 const UserServices = {
   createUser,
+  getAllUsers,
 };
 export default UserServices;
