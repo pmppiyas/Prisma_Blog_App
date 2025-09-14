@@ -1,9 +1,10 @@
 import { Router } from "express";
 import { PostController } from "./post.controller";
+import { multerUpload } from "../../config/multer";
 
 const router = Router();
 
-router.post("/create", PostController.createPost);
+router.post("/create", multerUpload.single("file"), PostController.createPost);
 
 router.get("/", PostController.getAllPost);
 

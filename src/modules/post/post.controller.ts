@@ -6,13 +6,18 @@ import httpStatus from "http-status-codes";
 
 const createPost = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const User = await PostServices.createPost(req.body);
+    const parsedData = JSON.parse(req.body.data) || req.body;
+    const payload = {
+      ...parsedData,
+      thumbnail: req?.file?.path,
+    };
+    const post = await PostServices.createPost(payload);
 
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.CREATED,
       message: "Post create successfully",
-      data: User,
+      data: post,
     });
   }
 );
