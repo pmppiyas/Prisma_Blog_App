@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client";
 import prisma from "../../config/db";
 import { safeAuthorSelect, validSortFields } from "../../constant";
+import { buildPostQuery } from "../../utils/queryBuilder";
 
 const createPost = async (payload: Prisma.PostsCreateInput) => {
   const create = await prisma.posts.create({
@@ -38,46 +39,14 @@ const getAllPost = async ({
 }: PaginationParams) => {
   const skip = (page - 1) * limit;
 
-  const filters = [];
-
-  if (search) {
-    filters.push({
-      OR: [
-        { title: { contains: search, mode: Prisma.QueryMode.insensitive } },
-        { content: { contains: search, mode: Prisma.QueryMode.insensitive } },
-      ],
-    });
-  }
-
-  if (author) {
-    filters.push({
-      authoreId: author,
-    });
-  }
-
-  if (typeof isFeatured === "boolean") {
-    filters.push({ isFeatured });
-  }
-
-  if (tags && Array.isArray(tags) && tags.length > 0) {
-    filters.push({
-      tag: {
-        hasSome: tags,
-      },
-    });
-  }
-
-  const where: Prisma.PostsWhereInput =
-    filters.length > 0 ? { AND: filters } : {};
-
-  const sortField = validSortFields.includes(sortBy || "")
-    ? sortBy!
-    : "createdAt";
-  const sortDirection: Prisma.SortOrder = sortOrder === "desc" ? "desc" : "asc";
-
-  const orderBy: Prisma.PostsOrderByWithRelationInput = {
-    [sortField]: sortDirection,
-  };
+  const { where, orderBy } = buildPostQuery({
+    search,
+    isFeatured,
+    author,
+    tags,
+    sortBy,
+    sortOrder,
+  });
 
   const posts = await prisma.posts.findMany({
     where,
@@ -97,15 +66,12 @@ const getAllPost = async ({
   const meta = {
     total,
     inPageTotal,
-    page: page,
-    limit: limit,
+    page,
     totalPage: Math.ceil(total / limit),
+    limit,
   };
 
-  return {
-    posts,
-    meta,
-  };
+  return { posts, meta };
 };
 
 const getAPost = async (id: number) => {
