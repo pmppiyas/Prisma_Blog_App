@@ -2,7 +2,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response, NextFunction } from "express";
 import httpStatus from "http-status-codes";
-import { AppError } from '../error/appError';
+import { AppError } from "../error/appError";
+import { envVars } from "../config/env";
 
 export const globalErrorHandler = (
   err: any,
@@ -25,6 +26,6 @@ export const globalErrorHandler = (
     success: false,
     message: message,
     err,
-    stack: process.env.NODE_ENV === "development" ? err.stack : null,
+    stack: envVars.NODE_ENV === "development" ? err.stack : null,
   });
 };
