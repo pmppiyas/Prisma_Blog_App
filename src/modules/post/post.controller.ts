@@ -36,6 +36,8 @@ const getAllPost = catchAsync(
       typeof req.query.tags === "string"
         ? req.query.tags.split(",").map((tag) => tag.trim())
         : [];
+    const sortBy = (req.query.sortBy as string) || "createdAt";
+    const sortOrder = (req.query.sortOrder as string) || "asc";
 
     const posts = await PostServices.getAllPost({
       page,
@@ -44,6 +46,8 @@ const getAllPost = catchAsync(
       isFeatured,
       author,
       tags,
+      sortBy,
+      sortOrder,
     });
 
     sendResponse(res, {

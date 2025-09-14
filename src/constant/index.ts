@@ -17,3 +17,5 @@ export const safeAuthorSelect = {
   name: true,
   email: true,
 };
+
+export const validSortFields = ["createdAt", "title", "views", "id"];

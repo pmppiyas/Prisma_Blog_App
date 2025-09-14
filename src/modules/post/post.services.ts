@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 import prisma from "../../config/db";
-import { safeAuthorSelect } from "../../constant";
+import { safeAuthorSelect, validSortFields } from "../../constant";
 
 const createPost = async (payload: Prisma.PostsCreateInput) => {
   const create = await prisma.posts.create({
@@ -21,7 +21,9 @@ interface PaginationParams {
   search?: string;
   isFeatured?: boolean;
   author?: number;
-  tags: any;
+  tags?: any;
+  sortBy?: string;
+  sortOrder?: string;
 }
 
 const getAllPost = async ({
@@ -31,6 +33,8 @@ const getAllPost = async ({
   isFeatured,
   author,
   tags,
+  sortBy,
+  sortOrder,
 }: PaginationParams) => {
   const skip = (page - 1) * limit;
 
@@ -66,11 +70,18 @@ const getAllPost = async ({
   const where: Prisma.PostsWhereInput =
     filters.length > 0 ? { AND: filters } : {};
 
+  const sortField = validSortFields.includes(sortBy || "")
+    ? sortBy!
+    : "createdAt";
+  const sortDirection: Prisma.SortOrder = sortOrder === "desc" ? "desc" : "asc";
+
+  const orderBy: Prisma.PostsOrderByWithRelationInput = {
+    [sortField]: sortDirection,
+  };
+
   const posts = await prisma.posts.findMany({
     where,
-    orderBy: {
-      createdAt: "asc",
-    },
+    orderBy,
     include: {
       author: {
         select: safeAuthorSelect,
@@ -80,8 +91,15 @@ const getAllPost = async ({
     take: limit,
   });
 
+  const total = await prisma.posts.count();
+  const inPageTotal = await prisma.posts.count({ where, skip, take: limit });
+
   const meta = {
-    total: posts.length,
+    total,
+    inPageTotal,
+    page: page,
+    limit: limit,
+    totalPage: Math.ceil(total / limit),
   };
 
   return {
