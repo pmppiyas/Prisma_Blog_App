@@ -2,6 +2,7 @@ import compression from "compression";
 import cors from "cors";
 import express from "express";
 import router from "./routes";
+import { globalErrorHandler } from "./middleware/globalErrorhandler";
 
 const app = express();
 
@@ -14,6 +15,7 @@ app.get("/", (_req, res) => {
 });
 
 app.use("/api/v1", router);
+app.use(globalErrorHandler);
 
 // 404 Handler
 app.use((req, res, next) => {

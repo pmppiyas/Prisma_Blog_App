@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client";
 import prisma from "../../config/db";
 import { safeUserSelect } from "../../constant";
+import { AppError } from "../../error/AppError";
 
 const createUser = async (payload: Prisma.UserCreateInput) => {
   const create = await prisma.user.create({
@@ -22,6 +23,10 @@ const getAuser = async (id: number) => {
     },
     select: safeUserSelect,
   });
+
+  if (!user) {
+    throw new AppError(404, "User Not Found!!!!!");
+  }
 
   return user;
 };
