@@ -43,8 +43,25 @@ const getAPost = catchAsync(
   }
 );
 
+const updateAPost = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const result = await PostServices.updatePost(
+      Number(req.params.id),
+      req.body
+    );
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Post update successfully",
+      data: result,
+    });
+  }
+);
+
 export const PostController = {
   createPost,
   getAllPost,
   getAPost,
+  updateAPost,
 };

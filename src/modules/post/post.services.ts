@@ -43,9 +43,22 @@ const getAPost = async (id: number) => {
 
   return post;
 };
+
+const updatePost = async (id: number, payload: any) => {
+  const result = prisma.posts.update({
+    where: {
+      id,
+    },
+    data: payload,
+  });
+
+  return result;
+};
+
 const PostServices = {
   createPost,
   getAllPost,
   getAPost,
+  updatePost,
 };
 export default PostServices;
