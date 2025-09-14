@@ -16,7 +16,7 @@ const createPost = async (payload: Prisma.PostsCreateInput) => {
 };
 
 const getAllPost = async () => {
-  const posts = prisma.posts.findMany({
+  const posts = await prisma.posts.findMany({
     orderBy: {
       createdAt: "asc",
     },
@@ -26,11 +26,19 @@ const getAllPost = async () => {
       },
     },
   });
-  return posts;
+
+  const meta = {
+    total: posts.length,
+  };
+
+  return {
+    posts,
+    meta,
+  };
 };
 
 const getAPost = async (id: number) => {
-  const post = prisma.posts.findUnique({
+  const post = await prisma.posts.findUnique({
     where: {
       id,
     },
@@ -45,7 +53,7 @@ const getAPost = async (id: number) => {
 };
 
 const updatePost = async (id: number, payload: any) => {
-  const result = prisma.posts.update({
+  const result = await prisma.posts.update({
     where: {
       id,
     },
@@ -55,10 +63,21 @@ const updatePost = async (id: number, payload: any) => {
   return result;
 };
 
+const deletePost = async (id: number) => {
+  await prisma.posts.delete({
+    where: {
+      id,
+    },
+  });
+
+  return null;
+};
+
 const PostServices = {
   createPost,
   getAllPost,
   getAPost,
   updatePost,
+  deletePost,
 };
 export default PostServices;
