@@ -27,11 +27,16 @@ const getAllPost = catchAsync(
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
     const search = typeof req.query.search === "string" ? req.query.search : "";
+    const isFeatured =
+      typeof req.query.isFeatured === "string"
+        ? req.query.isFeatured === "true"
+        : undefined;
 
     const posts = await PostServices.getAllPost({
       page,
       limit,
       search,
+      isFeatured,
     });
 
     sendResponse(res, {

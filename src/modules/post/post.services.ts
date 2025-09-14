@@ -18,29 +18,44 @@ const createPost = async (payload: Prisma.PostsCreateInput) => {
 interface PaginationParams {
   page: number;
   limit: number;
-  search: string;
+  search?: string;
+  isFeatured?: boolean;
 }
 
-const getAllPost = async ({ page, limit, search }: PaginationParams) => {
-  console.log(search);
+const getAllPost = async ({
+  page,
+  limit,
+  search,
+  isFeatured,
+}: PaginationParams) => {
   const skip = (page - 1) * limit;
+
+  const where: any = {
+    AND: [
+      search && {
+        OR: [
+          {
+            title: {
+              contains: search,
+              mode: "insensitive",
+            },
+          },
+          {
+            content: {
+              contains: search,
+              mode: "insensitive",
+            },
+          },
+        ],
+      },
+
+      typeof isFeatured === "boolean" && {
+        isFeatured,
+      },
+    ],
+  };
   const posts = await prisma.posts.findMany({
-    where: {
-      OR: [
-        {
-          title: {
-            contains: search,
-            mode: "insensitive",
-          },
-        },
-        {
-          content: {
-            contains: search,
-            mode: "insensitive",
-          },
-        },
-      ],
-    },
+    where: where,
 
     orderBy: {
       createdAt: "asc",
