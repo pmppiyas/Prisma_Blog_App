@@ -26,10 +26,12 @@ const getAllPost = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
+    const search = typeof req.query.search === "string" ? req.query.search : "";
 
     const posts = await PostServices.getAllPost({
       page,
       limit,
+      search,
     });
 
     sendResponse(res, {

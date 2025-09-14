@@ -18,11 +18,30 @@ const createPost = async (payload: Prisma.PostsCreateInput) => {
 interface PaginationParams {
   page: number;
   limit: number;
+  search: string;
 }
 
-const getAllPost = async ({ page, limit }: PaginationParams) => {
+const getAllPost = async ({ page, limit, search }: PaginationParams) => {
+  console.log(search);
   const skip = (page - 1) * limit;
   const posts = await prisma.posts.findMany({
+    where: {
+      OR: [
+        {
+          title: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+        {
+          content: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+      ],
+    },
+
     orderBy: {
       createdAt: "asc",
     },
