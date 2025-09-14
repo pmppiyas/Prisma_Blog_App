@@ -1,11 +1,12 @@
 import { Prisma } from "@prisma/client";
 import prisma from "../../config/db";
 import { safeUserSelect } from "../../constant";
-import { AppError } from "../../error/AppError";
+import { AppError } from "../../error/appError";
 
 const createUser = async (payload: Prisma.UserCreateInput) => {
   const create = await prisma.user.create({
     data: payload,
+    select: safeUserSelect,
   });
   return create;
 };

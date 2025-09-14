@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response, NextFunction } from "express";
 import httpStatus from "http-status-codes";
-import { AppError } from "../error/AppError";
+import { AppError } from '../error/appError';
 
 export const globalErrorHandler = (
   err: any,

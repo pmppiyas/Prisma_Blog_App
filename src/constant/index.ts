@@ -11,3 +11,9 @@ export const safeUserSelect = {
   createdAt: true,
   updatedAt: true,
 };
+
+export const safeAuthorSelect = {
+  id: true,
+  name: true,
+  email: true,
+};
