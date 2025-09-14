@@ -20,12 +20,32 @@ const getAllPost = async () => {
     orderBy: {
       createdAt: "asc",
     },
+    include: {
+      author: {
+        select: safeAuthorSelect,
+      },
+    },
   });
   return posts;
 };
 
+const getAPost = async (id: number) => {
+  const post = prisma.posts.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      author: {
+        select: safeAuthorSelect,
+      },
+    },
+  });
+
+  return post;
+};
 const PostServices = {
   createPost,
   getAllPost,
+  getAPost,
 };
 export default PostServices;

@@ -29,7 +29,22 @@ const getAllPost = catchAsync(
     });
   }
 );
+
+const getAPost = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const posts = await PostServices.getAPost(Number(req.params.id));
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "This post retreived successfully",
+      data: posts,
+    });
+  }
+);
+
 export const PostController = {
   createPost,
   getAllPost,
+  getAPost,
 };

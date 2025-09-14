@@ -7,4 +7,6 @@ router.post("/create", PostController.createPost);
 
 router.get("/", PostController.getAllPost);
 
+router.get("/:id", PostController.getAPost);
+
 export const PostRouter = router;
