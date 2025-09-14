@@ -32,6 +32,10 @@ const getAllPost = catchAsync(
         ? req.query.isFeatured === "true"
         : undefined;
     const author = Number(req.query.author) || undefined;
+    const tags =
+      typeof req.query.tags === "string"
+        ? req.query.tags.split(",").map((tag) => tag.trim())
+        : [];
 
     const posts = await PostServices.getAllPost({
       page,
@@ -39,6 +43,7 @@ const getAllPost = catchAsync(
       search,
       isFeatured,
       author,
+      tags,
     });
 
     sendResponse(res, {
