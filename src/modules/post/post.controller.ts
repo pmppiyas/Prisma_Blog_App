@@ -31,12 +31,14 @@ const getAllPost = catchAsync(
       typeof req.query.isFeatured === "string"
         ? req.query.isFeatured === "true"
         : undefined;
+    const author = Number(req.query.author) || undefined;
 
     const posts = await PostServices.getAllPost({
       page,
       limit,
       search,
       isFeatured,
+      author,
     });
 
     sendResponse(res, {

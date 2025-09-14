@@ -20,6 +20,7 @@ interface PaginationParams {
   limit: number;
   search?: string;
   isFeatured?: boolean;
+  author?: number;
 }
 
 const getAllPost = async ({
@@ -27,36 +28,36 @@ const getAllPost = async ({
   limit,
   search,
   isFeatured,
+  author,
 }: PaginationParams) => {
+  console.log(author);
   const skip = (page - 1) * limit;
 
-  const where: any = {
-    AND: [
-      search && {
-        OR: [
-          {
-            title: {
-              contains: search,
-              mode: "insensitive",
-            },
-          },
-          {
-            content: {
-              contains: search,
-              mode: "insensitive",
-            },
-          },
-        ],
-      },
+  const filters = [];
 
-      typeof isFeatured === "boolean" && {
-        isFeatured,
-      },
-    ],
-  };
+  if (search) {
+    filters.push({
+      OR: [
+        { title: { contains: search, mode: "insensitive" } },
+        { content: { contains: search, mode: "insensitive" } },
+      ],
+    });
+  }
+
+  if (author) {
+    filters.push({
+      authoreId: author,
+    });
+  }
+
+  if (typeof isFeatured === "boolean") {
+    filters.push({ isFeatured });
+  }
+
+  const where: any = filters.length > 0 ? { AND: filters } : {};
+
   const posts = await prisma.posts.findMany({
-    where: where,
-
+    where,
     orderBy: {
       createdAt: "asc",
     },
