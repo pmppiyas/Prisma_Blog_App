@@ -52,7 +52,7 @@ const getAPost = async (id: number) => {
   return post;
 };
 
-const updatePost = async (id: number, payload: any) => {
+const updatePost = async (id: number, payload: Prisma.PostsUpdateInput) => {
   const result = await prisma.posts.update({
     where: {
       id,
