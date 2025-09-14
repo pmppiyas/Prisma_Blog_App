@@ -15,7 +15,13 @@ const createPost = async (payload: Prisma.PostsCreateInput) => {
   return create;
 };
 
-const getAllPost = async () => {
+interface PaginationParams {
+  page: number;
+  limit: number;
+}
+
+const getAllPost = async ({ page, limit }: PaginationParams) => {
+  const skip = (page - 1) * limit;
   const posts = await prisma.posts.findMany({
     orderBy: {
       createdAt: "asc",
@@ -25,6 +31,8 @@ const getAllPost = async () => {
         select: safeAuthorSelect,
       },
     },
+    skip,
+    take: limit,
   });
 
   const meta = {

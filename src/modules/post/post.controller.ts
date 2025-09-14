@@ -24,7 +24,13 @@ const createPost = catchAsync(
 
 const getAllPost = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const posts = await PostServices.getAllPost();
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+
+    const posts = await PostServices.getAllPost({
+      page,
+      limit,
+    });
 
     sendResponse(res, {
       success: true,
