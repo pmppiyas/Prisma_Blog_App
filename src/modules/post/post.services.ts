@@ -16,7 +16,7 @@ const createPost = async (payload: Prisma.PostsCreateInput) => {
   return create;
 };
 
-interface PaginationParams {
+interface QueryParams {
   page: number;
   limit: number;
   search?: string;
@@ -36,7 +36,7 @@ const getAllPost = async ({
   tags,
   sortBy,
   sortOrder,
-}: PaginationParams) => {
+}: QueryParams) => {
   const skip = (page - 1) * limit;
 
   const { where, orderBy } = buildPostQuery({
@@ -75,18 +75,32 @@ const getAllPost = async ({
 };
 
 const getAPost = async (id: number) => {
-  const post = await prisma.posts.findUnique({
-    where: {
-      id,
-    },
-    include: {
-      author: {
-        select: safeAuthorSelect,
+  const result = await prisma.$transaction(async (tx) => {
+    const post = await tx.posts.findUnique({
+      where: {
+        id,
       },
-    },
+      include: {
+        author: {
+          select: safeAuthorSelect,
+        },
+      },
+    });
+
+    await tx.posts.update({
+      where: {
+        id,
+      },
+      data: {
+        views: {
+          increment: 1,
+        },
+      },
+    });
+    return post;
   });
 
-  return post;
+  return result;
 };
 
 const updatePost = async (id: number, payload: Prisma.PostsUpdateInput) => {
