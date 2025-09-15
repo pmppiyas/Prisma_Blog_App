@@ -14,4 +14,6 @@ router.put("/update/:id", PostController.updateAPost);
 
 router.delete("/delete/:id", PostController.deletePost);
 
+//Stats
+router.get("/stat/s", PostController.getStats);
 export const PostRouter = router;

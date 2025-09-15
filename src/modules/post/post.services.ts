@@ -124,11 +124,82 @@ const deletePost = async (id: number) => {
   return null;
 };
 
+//Stats
+
+const getStats = async () => {
+  return await prisma.$transaction(async (tx) => {
+    const aggregates = await tx.posts.aggregate({
+      _count: true,
+      _sum: { views: true },
+      _min: { views: true },
+      _avg: { views: true },
+      _max: { views: true },
+    });
+
+    const totalPosts = aggregates._count;
+    const totalViews = aggregates._sum?.views ?? 0;
+    const minViews = aggregates._min?.views ?? 0;
+    const maxViews = aggregates._max?.views ?? 0;
+    const avgViews = Number(aggregates._avg?.views?.toFixed(2)) || 0;
+
+    const featuredCount = await tx.posts.count({
+      where: {
+        isFeatured: true,
+      },
+    });
+
+    const topFeatured = await tx.posts.findFirst({
+      where: {
+        isFeatured: true,
+      },
+      orderBy: {
+        views: "desc",
+      },
+    });
+
+    const lastweek = new Date();
+    lastweek.setDate(lastweek.getDate() - 7);
+    const lastweekPostCount = await tx.posts.count({
+      where: {
+        createdAt: {
+          gte: lastweek,
+        },
+      },
+    });
+
+    const lastmonth = new Date();
+    lastmonth.setDate(lastmonth.getDate() - 30);
+
+    const lastmonthPostCount = await tx.posts.count({
+      where: {
+        createdAt: {
+          gte: lastmonth,
+        },
+      },
+    });
+    return {
+      stats: { totalPosts, totalViews, minViews, maxViews, avgViews },
+
+      featured: {
+        count: featuredCount,
+        topFeaturedPostId: topFeatured?.id,
+      },
+      lastweek: {
+        count: lastweekPostCount,
+      },
+      lastmonth: {
+        count: lastmonthPostCount,
+      },
+    };
+  });
+};
+
 const PostServices = {
   createPost,
   getAllPost,
   getAPost,
   updatePost,
   deletePost,
+  getStats,
 };
 export default PostServices;

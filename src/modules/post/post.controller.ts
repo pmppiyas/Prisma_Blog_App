@@ -3,10 +3,25 @@ import { Request, Response, NextFunction } from "express";
 import PostServices from "./post.services";
 import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status-codes";
+import { AppError } from "../../error/appError";
 
 const createPost = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const parsedData = JSON.parse(req.body.data) || req.body;
+    let parsedData;
+
+    if (typeof req.body.data === "string") {
+      try {
+        parsedData = JSON.parse(req.body.data);
+      } catch (err) {
+        throw new AppError(
+          httpStatus.BAD_REQUEST,
+          "Invalid JSON in 'data' field"
+        );
+      }
+    } else {
+      parsedData = req.body;
+    }
+
     const payload = {
       ...parsedData,
       thumbnail: req?.file?.path,
@@ -101,10 +116,26 @@ const deletePost = catchAsync(
   }
 );
 
+//Stats
+
+const getStats = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const result = await PostServices.getStats();
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Post's stats retreived successfully",
+      data: result,
+    });
+  }
+);
+
 export const PostController = {
   createPost,
   getAllPost,
   getAPost,
   updateAPost,
   deletePost,
+  getStats,
 };
