@@ -17,6 +17,20 @@ const loginByCredential = catchAsync(
   }
 );
 
+const googleLogin = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const login = await AuthServices.googleLogin(req.body);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Google login successfully",
+      data: login,
+    });
+  }
+);
+
 export const AuthController = {
   loginByCredential,
+  googleLogin,
 };
